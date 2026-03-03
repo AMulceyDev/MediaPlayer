@@ -13,10 +13,42 @@ void showBank(Coin bank[], int bankSize) {
     }
 }
 
+void sortBank(Coin bank[], int bankSize) {
+    for (int i = 0; i < bankSize; i++) {
+        for (int j = 0; j < bankSize - i - 1; j++) {
+            if (bank[j].value < bank[j + 1].value) {
+                Coin temp = bank[j];
+                bank[j] = bank[j + 1];
+                bank[j + 1] = temp;
+            }
+        }
+    }
+}
+
+int computeChange(Coin bank[], int bankSize, int remaining, Coin result[], int index) {
+    if (remaining == 0) return 1;
+    if (index >= bankSize || remaining < 0) return 0;
+
+    int maxCoins = remaining / bank[index].value;
+    if (maxCoins > bank[index].number) {
+        maxCoins = bank[index].number;
+    }
+
+    for (int use = maxCoins; use >= 0; use--) {
+        result[index].number = use;
+        if (computeChange(bank, bankSize, remaining - use * bank[index].value, result, index + 1)) {
+            return 1;
+        }
+    }
+
+    result[index].number = 0;
+    return 0;
+}
+
 int main() {
     printf("Change calculator by Amaury Mulcey\n\n");
 
-    Coin bank[] = {
+    Coin bank[8] = {
         {"1 centime", 1, 0},
         {"2 centimes", 2, 0},
         {"5 centimes", 5, 0},
@@ -33,6 +65,7 @@ int main() {
         scanf("%d", &bank[i].number);
     }
 
+    sortBank(bank, bankSize);
     showBank(bank, bankSize);
 
     int value;
@@ -41,12 +74,28 @@ int main() {
         scanf("%d", &value);
 
         if (value == -1) {
-            continue;
+            break;
         }
 
-        showBank(bank, bankSize);
-    }
-    while (value != -1);
-    
+        Coin result[bankSize];
+        for (int i = 0; i < bankSize; i++) {
+            result[i] = bank[i];
+        }
+
+        for (int i = 0; i < bankSize; i++) {
+            result[i].number = 0;
+        }
+
+        int canChange = computeChange(bank, bankSize, value, result, 0);
+        if (!canChange) {
+            printf("Cannot give exact change with current coins\n");
+        } else {
+            for (int i = 0; i < bankSize; i++) {
+                bank[i].number -= result[i].number;
+            }
+            showBank(bank, bankSize);
+        }
+    } while (value != -1);
+
     return 0;
 }
