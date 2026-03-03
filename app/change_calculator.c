@@ -14,7 +14,7 @@ void showBank(Coin bank[], int bankSize) {
 }
 
 int main() {
-    printf("Change calculator by Amaury Mulcey\n");
+    printf("Change calculator by Amaury Mulcey\n\n");
 
     Coin bank[] = {
         {"1 centime", 1, 0},
@@ -27,7 +27,6 @@ int main() {
         {"2 euros", 200, 0},
     };
 
-    printf("\n");
     int bankSize = sizeof(bank) / sizeof(bank[0]);
     for (int i = 0; i < bankSize; i++) {
         printf("how many %s do you have? : ", bank[i].name);
@@ -36,5 +35,18 @@ int main() {
 
     showBank(bank, bankSize);
 
+    int value;
+    do {
+        printf("\nhow much to give back (-1 to exit) : ");
+        scanf("%d", &value);
+
+        if (value == -1) {
+            continue;
+        }
+
+        showBank(bank, bankSize);
+    }
+    while (value != -1);
+    
     return 0;
 }
