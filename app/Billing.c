@@ -64,12 +64,7 @@ void generateConfigFile()
         printf("Error creating configuration file.\n");
         return;
     }
-    Header header = {
-        .BusinessName = "default",
-        .BusinessAddress = "default",
-        .BusinessPhone = "+0000000000",
-        .BussinessIdentificationNumber = "000000000000",
-        .BusinessEmail = "default@default.default"};
+    Header header = {};
     printf("Enter Business Name: ");
     scanf("%s", header.BusinessName);
 
