@@ -41,7 +41,8 @@ typedef struct
 bool isConfigFileValid()
 {
     FILE *file = fopen("config.txt", "r");
-    if (file == NULL)
+    char line[256];
+    if (file == NULL || !fgets(line, sizeof(line), file))
     {
         return false;
     }
@@ -82,6 +83,7 @@ Constants generateConfigFile()
     fclose(file);
     return constants;
 }
+
 
 
 int main(void) {
