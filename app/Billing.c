@@ -176,18 +176,27 @@ Customer customerGathering()
     scanf("%s", customer.BillingNumber);
     return customer;
 }
-Item itemGathering()
+void itemGathering(Item item)
 {
-    Item item = {};
     printf("%s", "Please enter the following information about the item:\n");
     printf("Item Description: ");
     scanf("%s", item.description);
     printf("Item Quantity: ");
-    scanf("%d", &item.quantity);
+    while (scanf("%d", &item.quantity) != 1)
+    {
+        //while getchar car lors d'un bug, scanf ne supprime pas le caractère invalide de l'entrée, ce qui crée une boucle infinie
+        // si le while n'est pas là, les charactère sont vidé un par un du buffeur mais l'affichage de invalid input se fait * le nom de char
+        while (getchar() != '\n');
+        printf("Invalid input. Item Quantity: ");
+    }
     printf("Item Unit Price: ");
-    scanf("%f", &item.unitPrice);
-    item.totalPrice = item.quantity * item.unitPrice;
-    return item;
+    while (scanf("%f", &item.unitPrice) != 1)
+    {
+        while (getchar() != '\n');
+        printf("Invalid input. Item Unit Price: ");
+    }
+    //item.totalPrice = item.quantity * item.unitPrice;
+    return ;
 }
 void billing(Constants constants)
 {
@@ -199,10 +208,9 @@ void billing(Constants constants)
     {
         itemCount++;
         items = realloc(items, itemCount * sizeof(Item));
-        items[itemCount - 1] = itemGathering();
-        printf("Do you want to add another item? (y/n): ");
-        printf("Your choice: ");
-        scanf("%s", &choice);
+        itemGathering(items[itemCount - 1]);
+        printf("%s", "cacapoupou\n");
+        scanf(" %c", &choice);
         
     } while (choice == 'y' || choice == 'Y');
     
