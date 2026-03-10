@@ -13,6 +13,12 @@ void showBank(Coin bank[], int bankSize) {
     }
 }
 
+void updateCSVFile(Coin bank[], int bankSize) {
+    FILE *file = fopen("data.csv", "a");
+    fprintf(file, "%d,%d,%d,%d,%d,%d,%d,%d\n", bank[0].number, bank[1].number, bank[2].number, bank[3].number, bank[4].number, bank[5].number, bank[6].number, bank[7].number, bank[8].number);
+    fclose(file);
+}
+
 void sortBank(Coin bank[], int bankSize) {
     for (int i = 0; i < bankSize; i++) {
         for (int j = 0; j < bankSize - i - 1; j++) {
@@ -49,28 +55,29 @@ int main() {
     printf("Change calculator by Amaury Mulcey\n\n");
 
     Coin bank[8] = {
-        {"1 centime", 1, 0},
-        {"2 centimes", 2, 0},
-        {"5 centimes", 5, 0},
-        {"10 centimes", 10, 0},
-        {"20 centimes", 20, 0},
-        {"50 centimes", 50, 0},
+        {"1 cent", 1, 0},
+        {"2 cents", 2, 0},
+        {"5 cents", 5, 0},
+        {"10 cents", 10, 0},
+        {"20 cents", 20, 0},
+        {"50 cents", 50, 0},
         {"1 euro", 100, 0},
         {"2 euros", 200, 0},
     };
 
     int bankSize = sizeof(bank) / sizeof(bank[0]);
     for (int i = 0; i < bankSize; i++) {
-        printf("how many %s do you have? : ", bank[i].name);
+        printf("How many %s do you have? : ", bank[i].name);
         scanf("%d", &bank[i].number);
     }
 
     sortBank(bank, bankSize);
     showBank(bank, bankSize);
+    updateCSVFile(bank, bankSize);
 
     int value;
     do {
-        printf("\nhow much to give back (-1 to exit) : ");
+        printf("\nHow much change to give back (in cents)? (-1 to exit) :");
         scanf("%d", &value);
 
         if (value == -1) {
@@ -80,9 +87,6 @@ int main() {
         Coin result[bankSize];
         for (int i = 0; i < bankSize; i++) {
             result[i] = bank[i];
-        }
-
-        for (int i = 0; i < bankSize; i++) {
             result[i].number = 0;
         }
 
@@ -93,7 +97,9 @@ int main() {
             for (int i = 0; i < bankSize; i++) {
                 bank[i].number -= result[i].number;
             }
+
             showBank(bank, bankSize);
+            updateCSVFile(bank, bankSize);
         }
     } while (value != -1);
 
