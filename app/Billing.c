@@ -36,8 +36,8 @@ typedef struct
 
 
 
-
-
+// Loading and generating config file functions
+// --------------------------------------------------------------------
 bool isConfigFileValid()
 {
     FILE *file = fopen("config.txt", "r");
@@ -61,15 +61,16 @@ void printInFile(FILE *file, char *text, void *args, char *defaultValue)
     fprintf(file, "%s=%s\n", text, (char *)args);
 }
 
-Constants generateConfigFile()
+void generateConfigFile(Constants constants)
 {
+    printf("Generating configuration file...\n");
     FILE *file = fopen("config.txt", "w");
     if (file == NULL)
     {
         printf("Error creating configuration file.\n");
         return;
     }
-    Constants constants = {};
+    //constants = {};
     printf("%s", "Please enter the following information to generate the configuration file (/ to default):\n");
     printInFile(file, "Business-Name", constants.BusinessName, "Default Business Name");
     printInFile(file, "Business-Address", constants.BusinessAddress, "17000, La Rochelle, France");
@@ -81,15 +82,146 @@ Constants generateConfigFile()
     printInFile(file, "IBAN", constants.IBAN, "000000000000000000000000000");
     printInFile(file, "BIC", constants.BIC, "000000000");
     fclose(file);
-    return constants;
+    return ;
+}
+
+void loadConfigFile(Constants constants)
+{
+    printf("Loading configuration file...\n");
+    FILE *file = fopen("config.txt", "r");
+    if (file == NULL)
+    {
+        printf("Error opening configuration file.\n");
+        return;
+    }
+    int verif = 0;
+    //constants = {};
+    char line[256];
+    while (fgets(line, sizeof(line), file))
+    {
+        char *key = strtok(line, "=");
+        char *value = strtok(NULL, "\n");
+        if (strcmp(key, "Business-Name") == 0)
+        {
+            strcpy(constants.BusinessName, value);
+            verif++;
+        }
+        else if (strcmp(key, "Business-Address") == 0)
+        {
+            strcpy(constants.BusinessAddress, value);
+            verif++;
+        }
+        else if (strcmp(key, "Business-Phone") == 0)
+        {
+            strcpy(constants.BusinessPhone, value);
+            verif++;
+        }
+        else if (strcmp(key, "Bussiness-Identification-Number") == 0)
+        {
+            strcpy(constants.BussinessIdentificationNumber, value);
+            verif++;
+        }
+        else if (strcmp(key, "Business-Email") == 0)
+        {
+            strcpy(constants.BusinessEmail, value);
+            verif++;
+        }
+        else if (strcmp(key, "Legal-Notice") == 0)
+        {
+            strcpy(constants.legalNotice, value);
+            verif++;
+        }
+        else if (strcmp(key, "Payment-Terms") == 0)
+        {
+            strcpy(constants.paymentTerms, value);
+            verif++;
+        }
+        else if (strcmp(key, "IBAN") == 0)
+        {
+            strcpy(constants.IBAN, value);
+            verif++;
+        }
+        else if (strcmp(key, "BIC") == 0)
+        {
+            strcpy(constants.BIC, value);
+            verif++;
+        }
+    }
+    fclose(file);
+    if (verif != 9)
+    {
+        printf("Configuration file is invalid. Generating a new one...\n");
+        generateConfigFile(constants);
+        return ;
+    }
+    return ;
 }
 
 
 
+
+// Billing generation functions
+// --------------------------------------------------------------------
+Customer customerGathering()
+{
+    Customer customer = {};
+    printf("%s", "Please enter the following information about the customer:\n");
+    printf("Customer Name: ");
+    scanf("%s", customer.name);
+    printf("Customer Address: ");
+    scanf("%s", customer.address);
+    printf("Billing Date (dd/mm/yyyy): ");
+    scanf("%s", customer.BillingDate);
+    printf("Billing Number: ");
+    scanf("%s", customer.BillingNumber);
+    return customer;
+}
+Item itemGathering()
+{
+    Item item = {};
+    printf("%s", "Please enter the following information about the item:\n");
+    printf("Item Description: ");
+    scanf("%s", item.description);
+    printf("Item Quantity: ");
+    scanf("%d", &item.quantity);
+    printf("Item Unit Price: ");
+    scanf("%f", &item.unitPrice);
+    item.totalPrice = item.quantity * item.unitPrice;
+    return item;
+}
+void billing(Constants constants)
+{
+    Customer customer = customerGathering();
+    int itemCount = 0;
+    Item *items = NULL;
+    char choice = 'n';
+    do
+    {
+        itemCount++;
+        items = realloc(items, itemCount * sizeof(Item));
+        items[itemCount - 1] = itemGathering();
+        printf("Do you want to add another item? (y/n): ");
+        printf("Your choice: ");
+        scanf("%s", &choice);
+        
+    } while (choice == 'y' || choice == 'Y');
+    
+    
+
+}
+
 int main(void) {
+    printf("Billing!\n");
+    Constants constant;
     if (!isConfigFileValid())
     {
-        generateConfigFile();
+        generateConfigFile(constant);
     }
+    else
+    {
+        loadConfigFile(constant);
+    }
+    billing(constant);
+    return 0;
     
 }
