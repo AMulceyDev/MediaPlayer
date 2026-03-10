@@ -1,4 +1,6 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct Coin {
     char name[12];
@@ -13,9 +15,33 @@ void showBank(Coin bank[], int bankSize) {
     }
 }
 
+int loadFromCSV(Coin bank[], int bankSize) {
+    FILE *file = fopen("data.csv", "r");
+
+    if (!file) {
+        return 0;
+    }
+
+    char line[256];
+    char last_line[256];
+    while (fgets(line, sizeof(line), file)) {
+        strcpy(last_line, line);
+    }
+
+    char *strToken = strtok(last_line, ",");
+
+    for (int i = 0; i < bankSize; i++) {
+        bank[i].number = atoi(strToken);
+        strToken = strtok ( NULL, "," );
+    }
+    fclose(file);
+
+    return 1;
+}
+
 void updateCSVFile(Coin bank[], int bankSize) {
     FILE *file = fopen("data.csv", "a");
-    fprintf(file, "%d,%d,%d,%d,%d,%d,%d,%d\n", bank[0].number, bank[1].number, bank[2].number, bank[3].number, bank[4].number, bank[5].number, bank[6].number, bank[7].number, bank[8].number);
+    fprintf(file, "%d,%d,%d,%d,%d,%d,%d,%d\n", bank[0].number, bank[1].number, bank[2].number, bank[3].number, bank[4].number, bank[5].number, bank[6].number, bank[7].number);
     fclose(file);
 }
 
@@ -66,14 +92,20 @@ int main() {
     };
 
     int bankSize = sizeof(bank) / sizeof(bank[0]);
-    for (int i = 0; i < bankSize; i++) {
-        printf("How many %s do you have? : ", bank[i].name);
-        scanf("%d", &bank[i].number);
+    int isBankLoaded = loadFromCSV(bank, bankSize);
+
+    if (!isBankLoaded) {
+        for (int i = 0; i < bankSize; i++) {
+            printf("How many %s do you have? : ", bank[i].name);
+            scanf("%d", &bank[i].number);
+        }
     }
 
-    sortBank(bank, bankSize);
     showBank(bank, bankSize);
-    updateCSVFile(bank, bankSize);
+    sortBank(bank, bankSize);
+    if (!isBankLoaded) {
+        updateCSVFile(bank, bankSize);
+    }
 
     int value;
     do {
