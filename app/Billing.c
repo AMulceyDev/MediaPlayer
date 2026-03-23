@@ -50,18 +50,34 @@ bool isConfigFileValid()
     return true;
 }
 
-void printInFile(FILE *file, char *text, void *args, char *defaultValue)
+void readLine(char *buffer, size_t size)
 {
-    printf("%s, default(%s): ", text, defaultValue);
-    scanf("%s", args);
-    if (strcmp((char *)args, "/") == 0)
+    char format[32];
+    if (size == 0)
     {
-        strcpy((char *)args, defaultValue);
+        return;
     }
-    fprintf(file, "%s=%s\n", text, (char *)args);
+    snprintf(format, sizeof(format), " %%%zu[^\n]", size - 1);
+    if (scanf(format, buffer) != 1)
+    {
+        buffer[0] = '\0';
+    }
+    while (getchar() != '\n' && !feof(stdin))
+        ;
 }
 
-void generateConfigFile(Constants constants)
+void printInFile(FILE *file, char *text, char *args, size_t size, char *defaultValue)
+{
+    printf("%s, default(%s): ", text, defaultValue);
+    readLine(args, size);
+    if (strcmp(args, "/") == 0)
+    {
+        strcpy(args, defaultValue);
+    }
+    fprintf(file, "%s=%s\n", text, args);
+}
+
+void generateConfigFile(Constants *constants)
 {
     printf("Generating configuration file...\n");
     FILE *file = fopen("config.txt", "w");
@@ -72,20 +88,20 @@ void generateConfigFile(Constants constants)
     }
     //constants = {};
     printf("%s", "Please enter the following information to generate the configuration file (/ to default):\n");
-    printInFile(file, "Business-Name", constants.BusinessName, "Default Business Name");
-    printInFile(file, "Business-Address", constants.BusinessAddress, "17000, La Rochelle, France");
-    printInFile(file, "Business-Phone", constants.BusinessPhone, "0000000000");
-    printInFile(file, "Bussiness-Identification-Number", constants.BussinessIdentificationNumber, "00000000000000");
-    printInFile(file, "Business-Email", constants.BusinessEmail, "default@example.com");
-    printInFile(file, "Legal-Notice", constants.legalNotice, "Dispensé d’immatriculation au registre du commerce et des sociétés et au répertoire des métiers");
-    printInFile(file, "Payment-Terms", constants.paymentTerms, "TVA non applicable, art. 293 B du CGI");
-    printInFile(file, "IBAN", constants.IBAN, "000000000000000000000000000");
-    printInFile(file, "BIC", constants.BIC, "000000000");
+    printInFile(file, "Business-Name", constants->BusinessName, sizeof(constants->BusinessName), "Default Business Name");
+    printInFile(file, "Business-Address", constants->BusinessAddress, sizeof(constants->BusinessAddress), "17000, La Rochelle, France");
+    printInFile(file, "Business-Phone", constants->BusinessPhone, sizeof(constants->BusinessPhone), "0000000000");
+    printInFile(file, "Bussiness-Identification-Number", constants->BussinessIdentificationNumber, sizeof(constants->BussinessIdentificationNumber), "00000000000000");
+    printInFile(file, "Business-Email", constants->BusinessEmail, sizeof(constants->BusinessEmail), "default@example.com");
+    printInFile(file, "Legal-Notice", constants->legalNotice, sizeof(constants->legalNotice), "Dispensé d’immatriculation au registre du commerce et des sociétés et au répertoire des métiers");
+    printInFile(file, "Payment-Terms", constants->paymentTerms, sizeof(constants->paymentTerms), "TVA non applicable, art. 293 B du CGI");
+    printInFile(file, "IBAN", constants->IBAN, sizeof(constants->IBAN), "000000000000000000000000000");
+    printInFile(file, "BIC", constants->BIC, sizeof(constants->BIC), "000000000");
     fclose(file);
     return ;
 }
 
-void loadConfigFile(Constants constants)
+void loadConfigFile(Constants *constants)
 {
     printf("Loading configuration file...\n");
     FILE *file = fopen("config.txt", "r");
@@ -103,47 +119,47 @@ void loadConfigFile(Constants constants)
         char *value = strtok(NULL, "\n");
         if (strcmp(key, "Business-Name") == 0)
         {
-            strcpy(constants.BusinessName, value);
+            strcpy(constants->BusinessName, value);
             verif++;
         }
         else if (strcmp(key, "Business-Address") == 0)
         {
-            strcpy(constants.BusinessAddress, value);
+            strcpy(constants->BusinessAddress, value);
             verif++;
         }
         else if (strcmp(key, "Business-Phone") == 0)
         {
-            strcpy(constants.BusinessPhone, value);
+            strcpy(constants->BusinessPhone, value);
             verif++;
         }
         else if (strcmp(key, "Bussiness-Identification-Number") == 0)
         {
-            strcpy(constants.BussinessIdentificationNumber, value);
+            strcpy(constants->BussinessIdentificationNumber, value);
             verif++;
         }
         else if (strcmp(key, "Business-Email") == 0)
         {
-            strcpy(constants.BusinessEmail, value);
+            strcpy(constants->BusinessEmail, value);
             verif++;
         }
         else if (strcmp(key, "Legal-Notice") == 0)
         {
-            strcpy(constants.legalNotice, value);
+            strcpy(constants->legalNotice, value);
             verif++;
         }
         else if (strcmp(key, "Payment-Terms") == 0)
         {
-            strcpy(constants.paymentTerms, value);
+            strcpy(constants->paymentTerms, value);
             verif++;
         }
         else if (strcmp(key, "IBAN") == 0)
         {
-            strcpy(constants.IBAN, value);
+            strcpy(constants->IBAN, value);
             verif++;
         }
         else if (strcmp(key, "BIC") == 0)
         {
-            strcpy(constants.BIC, value);
+            strcpy(constants->BIC, value);
             verif++;
         }
     }
@@ -162,27 +178,26 @@ void loadConfigFile(Constants constants)
 
 // Billing generation functions
 // --------------------------------------------------------------------
-Customer customerGathering()
+void customerGathering(Customer *customer)
 {
-    Customer customer = {};
     printf("%s", "Please enter the following information about the customer:\n");
     printf("Customer Name: ");
-    scanf("%s", customer.name);
+    readLine(customer->name, sizeof(customer->name));
     printf("Customer Address: ");
-    scanf("%s", customer.address);
+    readLine(customer->address, sizeof(customer->address));
     printf("Billing Date (dd/mm/yyyy): ");
-    scanf("%s", customer.BillingDate);
+    readLine(customer->BillingDate, sizeof(customer->BillingDate));
     printf("Billing Number: ");
-    scanf("%s", customer.BillingNumber);
-    return customer;
+    readLine(customer->BillingNumber, sizeof(customer->BillingNumber));
+    return ;
 }
-void itemGathering(Item item)
+void itemGathering(Item *item)
 {
     printf("%s", "Please enter the following information about the item:\n");
     printf("Item Description: ");
-    scanf("%s", item.description);
+    readLine(item->description, sizeof(item->description));
     printf("Item Quantity: ");
-    while (scanf("%d", &item.quantity) != 1)
+    while (scanf("%d", &item->quantity) != 1)
     {
         //while getchar car lors d'un bug, scanf ne supprime pas le caractère invalide de l'entrée, ce qui crée une boucle infinie
         // si le while n'est pas là, les charactère sont vidé un par un du buffeur mais l'affichage de invalid input se fait * le nom de char
@@ -190,7 +205,7 @@ void itemGathering(Item item)
         printf("Invalid input. Item Quantity: ");
     }
     printf("Item Unit Price: ");
-    while (scanf("%f", &item.unitPrice) != 1)
+    while (scanf("%f", &item->unitPrice) != 1)
     {
         while (getchar() != '\n');
         printf("Invalid input. Item Unit Price: ");
@@ -198,18 +213,17 @@ void itemGathering(Item item)
     //item.totalPrice = item.quantity * item.unitPrice;
     return ;
 }
-void billing(Constants constants)
+void billing(Constants *constants, Customer *customer, Item **items, int *itemCount)
 {
-    Customer customer = customerGathering();
-    int itemCount = 0;
-    Item *items = NULL;
+    (void)constants;
+    customerGathering(customer);
     char choice = 'n';
     do
     {
-        itemCount++;
-        items = realloc(items, itemCount * sizeof(Item));
-        itemGathering(items[itemCount - 1]);
-        printf("%s", "cacapoupou\n");
+        (*itemCount)++;
+        *items = realloc(*items, (*itemCount) * sizeof(Item));
+        itemGathering(&(*items)[(*itemCount) - 1]);
+        printf("%s", "Do you want to add another item? (y/n): ");
         scanf(" %c", &choice);
         
     } while (choice == 'y' || choice == 'Y');
@@ -218,18 +232,63 @@ void billing(Constants constants)
 
 }
 
+void generateMarkdown(Constants constants, Customer customer, Item *items, int itemCount)
+{
+    FILE *file = fopen("invoice.md", "w");
+    if (file == NULL)
+    {
+        printf("Error creating invoice file.\n");
+        return;
+    }
+    fprintf(file, "# Invoice\n\n");
+    fprintf(file, "## Business Information\n");
+    fprintf(file, "- Name: %s\n", constants.BusinessName);
+    fprintf(file, "- Address: %s\n", constants.BusinessAddress);
+    fprintf(file, "- Phone: %s\n", constants.BusinessPhone);
+    fprintf(file, "- Identification Number: %s\n", constants.BussinessIdentificationNumber);
+    fprintf(file, "- Email: %s\n", constants.BusinessEmail);
+    fprintf(file, "\n## Customer Information\n");
+    fprintf(file, "- Name: %s\n", customer.name);
+    fprintf(file, "- Address: %s\n", customer.address);
+    fprintf(file, "- Billing Date: %s\n", customer.BillingDate);
+    fprintf(file, "- Billing Number: %s\n", customer.BillingNumber);
+    fprintf(file, "\n## Items\n");
+    fprintf(file, "| Designation | Unit Price (EUR) | Quantity | Amount (EUR) |\n");
+    fprintf(file, "| --- | ---: | ---: | ---: |\n");
+    float totalAmount = 0;
+    for (int i = 0; i < itemCount; i++)
+    {
+        items[i].totalPrice = items[i].quantity * items[i].unitPrice;
+        totalAmount += items[i].totalPrice;
+        fprintf(file, "| %s | %.2f | %d | %.2f |\n", items[i].description, items[i].unitPrice, items[i].quantity, items[i].totalPrice);
+    }
+    fprintf(file, "\n## Total Amount Due: %.2f\n", totalAmount);
+    fprintf(file, "\n## Payment Terms\n");
+    fprintf(file, "%s\n", constants.paymentTerms);
+    fprintf(file, "- IBAN: %s\n", constants.IBAN);
+    fprintf(file, "- BIC: %s\n", constants.BIC);
+    fprintf(file, "\n## Legal Notice\n");
+    fprintf(file, "%s\n", constants.legalNotice);
+    fclose(file);
+}
+
 int main(void) {
     printf("Billing!\n");
-    Constants constant;
+    Constants constant = {0};
+    Customer customer = {0};
+    int itemCount = 0;
+    Item *items = NULL;
     if (!isConfigFileValid())
     {
-        generateConfigFile(constant);
+        generateConfigFile(&constant);
     }
     else
     {
-        loadConfigFile(constant);
+        loadConfigFile(&constant);
     }
-    billing(constant);
+    billing(&constant, &customer, &items, &itemCount);
+    generateMarkdown(constant, customer, items, itemCount);
+    free(items);
     return 0;
     
 }
