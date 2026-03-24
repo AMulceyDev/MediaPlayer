@@ -3,6 +3,8 @@ project(MediaPlayer C)
 add_executable(Billing Billing.c)
 add_executable(change_calculator change_calculator.c)
 
+
+
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
 
