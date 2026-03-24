@@ -4,6 +4,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/../cdRom")
 add_executable(Billing Billing.c)
 add_executable(change_calculator change_calculator.c)
 add_executable(blackjack blackjack.c)
+add_executable(compressFile compressFile.c)
 
 
 find_package(PkgConfig REQUIRED)
