@@ -1,5 +1,7 @@
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
+#include <time.h>
 
 #define NB_CARDS 52
 #define NB_DECKS 6
@@ -40,6 +42,18 @@ void generateShoe(Shoe *shoe) {
     }
 
     shoe->top = 0;
+    shuffleShoe(shoe);
+}
+
+void shuffleShoe(Shoe *shoe) {
+    srand(time(NULL));
+    int total = NB_CARDS * NB_DECKS;
+    for (int i = total - 1; i > 0; i--) {
+        int j = rand() % (i + 1);
+        Card tmp = shoe->cards[i];
+        shoe->cards[i] = shoe->cards[j];
+        shoe->cards[j] = tmp;
+    }
 }
 
 Card drawCard(Shoe *shoe, Hand *hand) {
@@ -74,82 +88,65 @@ void gameLogic(Shoe *shoe) {
 
     initGame(shoe, &playerHand, &bankHand);
 
-    printf("Player card's ");
+    printf("Player card's (");
     for (int i = 0; i < playerHand.totalCards; i++) {
         printf("%s, ", playerHand.cards[i].name);
     }
     printf(") (Total visible: %d)\n", playerHand.totalValue);
 
-    int round = 0;
+    printf("Bank card's (1 hidden, %s) (Total visible: %d)\n",
+           bankHand.cards[1].name, bankHand.cards[1].value);
+
     char choice[20];
-    do {
-        round++;
-
-        printf("Round %d\nPlayer turn\n", round);
-
+    while (1) {
         printf("'stand' or 'draw' : ");
-        scanf("%s", choice);
+        scanf("%19s", choice);
 
         if (strcmp(choice, "stand") == 0 || strcmp(choice, "s") == 0) {
-            if (playerHand.totalValue > bankHand.totalValue) {
-                printf("Player Win !\n");
-            } else if (playerHand.totalValue == bankHand.totalValue) {
-                printf("Push !\n");
-            } else {
-                printf("Bank Win !\n");
-            }
             break;
 
         } else if (strcmp(choice, "draw") == 0 || strcmp(choice, "d") == 0) {
             Card card = drawCard(shoe, &playerHand);
-            printf("Player draws a %s (Total visible: %d)\n", card.name, playerHand.totalValue);
+            printf("Player draws a %s (Total: %d)\n", card.name, playerHand.totalValue);
 
             if (playerHand.totalValue == 21) {
                 printf("BlackJack ! Player Win !\n");
-                break;
+                return;
             } else if (playerHand.totalValue > 21) {
                 printf("Bust ! Bank Win !\n");
-                break;
+                return;
             }
 
         } else if (strcmp(choice, "exit") == 0) {
-            break;
+            return;
         }
+    }
 
-        printf("BankTurn\n");
+    printf("\nBank turn\n");
+    printf("Bank reveals: (");
+    for (int i = 0; i < bankHand.totalCards; i++) {
+        printf("%s, ", bankHand.cards[i].name);
+    }
+    printf(") (Total: %d)\n", bankHand.totalValue);
 
-        if (round == 1) {
-            printf("Bank card's (1 hidden, ");
-            for (int i = 1; i < bankHand.totalCards; i++) {
-                printf("%s, ", bankHand.cards[i].name);
-            }
-            printf(") (Total visible: %d)\n", bankHand.totalValue - bankHand.cards[0].value);
+    while (bankHand.totalValue < 17) {
+        Card card = drawCard(shoe, &bankHand);
+        printf("Bank draws a %s (Total: %d)\n", card.name, bankHand.totalValue);
+
+        if (bankHand.totalValue > 21) {
+            printf("Bust ! Player Win !\n");
+            return;
         }
-        
+    }
 
-        if (bankHand.totalValue >= 17) {
-            if (bankHand.totalValue > playerHand.totalValue) {
-                printf("Bank Win !\n");
-            } else if (bankHand.totalValue == playerHand.totalValue) {
-                printf("Push !\n");
-            } else {
-                printf("Player Win !\n");
-            }
-            break;
-
-        } else {
-            Card card = drawCard(shoe, &bankHand);
-            printf("Bank draws a %s (Total visible: %d)\n", card.name, bankHand.totalValue - bankHand.cards[0].value);
-
-            if (bankHand.totalValue == 21) {
-                printf("BlackJack ! Bank Win !\n");
-                break;
-            } else if (bankHand.totalValue > 21) {
-                printf("Bust ! Player Win !\n");
-                break;
-            }
-        }
-    } while (1);
+    printf("\nPlayer: %d | Bank: %d\n", playerHand.totalValue, bankHand.totalValue);
+    if (playerHand.totalValue > bankHand.totalValue) {
+        printf("Player Win !\n");
+    } else if (playerHand.totalValue == bankHand.totalValue) {
+        printf("Push !\n");
+    } else {
+        printf("Bank Win !\n");
+    }
 }
 
 int main() {
