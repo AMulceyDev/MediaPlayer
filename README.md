@@ -1,6 +1,6 @@
 # Companion Virus
 
-> **Academic project** - No malicious payload. For educational purposes only.  
+> **Academic project**, No malicious payload. For educational purposes only.  
 > Developed by **LINARES Julien** & **MULCEY Amaury** - **University of La Rochelle**
 
 ---
@@ -24,7 +24,7 @@ The MediaPlayer itself is a GTK3 image viewer used as the initial infection vect
 ├── change_calculator.c    # Coin change calculator (bonus utility)
 ├── compressFile.c         # File compression utility (bonus utility)
 ├── encryption.c           # Caesar cipher utility (bonus utility)
-├── LREmailCounter.c       # GTK3 app – email counter for Univ. La Rochelle
+├── LREmailCounter.c       # GTK3 app - email counter for Univ. La Rochelle
 ├── media_player.c         # GTK3 MediaPlayer + companion virus
 └── CMakeLists.txt         # Build configuration
 ```
