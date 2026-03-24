@@ -15,3 +15,8 @@ target_include_directories(LREmailCounter PRIVATE ${GTK3_INCLUDE_DIRS})
 target_compile_options(LREmailCounter PRIVATE ${GTK3_CFLAGS_OTHER})
 target_link_libraries(LREmailCounter PRIVATE ${GTK3_LIBRARIES})
 
+add_executable(media_player media_player.c)
+target_include_directories(media_player PRIVATE ${GTK3_INCLUDE_DIRS})
+target_compile_options(media_player PRIVATE ${GTK3_CFLAGS_OTHER})
+target_link_libraries(media_player PRIVATE ${GTK3_LIBRARIES})
+
