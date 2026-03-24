@@ -100,7 +100,7 @@ void gameLogic(Shoe *shoe) {
     char choice[20];
     while (1) {
         printf("'stand' or 'draw' : ");
-        scanf("%19s", choice);
+        scanf("%s", choice);
 
         if (strcmp(choice, "stand") == 0 || strcmp(choice, "s") == 0) {
             break;
