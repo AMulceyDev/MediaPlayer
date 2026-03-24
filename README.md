@@ -82,8 +82,8 @@ cd ../cdRom
 
 ## Authors
 
-- **Amaury Mulcey** — MediaPlayer, utilities  
-- **Julien Linares** — Virus code, utilisties
+- **Amaury Mulcey** - MediaPlayer, utilities  
+- **Julien Linares** - Virus code, utilisties
 
 ---
 
